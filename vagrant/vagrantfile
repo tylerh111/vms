@@ -1,0 +1,25 @@
+=begin
+Vagrant Development VMs
+=end
+
+Vagrant.configure("2") do |config|
+
+    #================================
+    # global
+    #================================
+
+    # forward ssh agent for all vms
+    config.ssh.forward_agent = true
+
+    Dir["./**/vagrantfile.*.rb"].each {
+        |file|
+        begin
+            Vagrant.global_logger.info "loading vagrantfile #{file}"
+            require_relative file
+            vagrant_define_vm(Vagrant, config)
+            Vagrant.global_logger.info "loading vagrantfile #{file} (done)"
+        rescue => e
+            Vagrant.global_logger.error "loading vagrantfile #{file} (error); skipping... \n#{e.inspect}"
+    }
+
+end

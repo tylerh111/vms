@@ -1,0 +1,29 @@
+# ==============================================================================
+# kcli configuration: default
+# ==============================================================================
+
+default:
+
+  # base
+  client: localhost
+
+  # resources
+  numcpu: 2
+  memory: 2048
+
+  # storage
+  pool: default
+  disk:
+    - size 16
+
+  # networking
+  nets:
+    - default
+
+# ==============================================================================
+# kcli configuration: localhost
+# ==============================================================================
+
+localhost:
+  type: kvm
+  host: localhost

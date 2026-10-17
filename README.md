@@ -1,5 +1,69 @@
 # Development VMs
 
+## Kcli
+
+### **Environment**
+
+Kcli can be installed in several ways.
+See [Install Kcli](https://kcli.readthedocs.io/en/latest/#installation) for more information.
+The recommended approach is to use the PyPI package installation, via `uv`.
+Note, the `libvirt-dev` package must be installed.
+Also consider installing `websockify` for exposing a web console.
+
+```bash
+uvx kcli
+```
+
+It is recommended to create an alias for `kcli` if installed with `uv`.
+
+```bash
+alias kcli='uvx kcli'         # bash
+alias --save kcli='uvx kcli'  # fish
+
+```
+
+## **Usage**
+
+Use the following command to interact with the kcli provisioned vms.
+Kcli vms are specified in the `profiles.yml` file.
+
+```bash
+# control
+kcli create vm   <name> -p <profile>
+kcli create plan <name> -f <path> -P <key>=<value>
+kcli start       <name>
+kcli stop        <name>
+kcli delete      <name>
+kcli update      <name>
+
+# information
+kcli list vms
+kcli list image
+kcli list pool
+
+# connect
+kcli ssh     <name>
+kcli console <name>
+```
+
+### **Organization**
+
+The following is the organization of the `vagrant` section of the repository.
+
+* `kcli`: kcli configuration / profile / plan files.
+* `kcli/provision`: provisioning scripts and configs.
+* `kcli/config.yml`: example kcli config file.
+* `kcli/profiles.yml`: example kcli profile file.
+
+```bash
+/vms
+|-- kcli
+    |-- provision
+    |   |-- configs
+    |-- config.yml
+    |-- profiles.yml
+```
+
 ## Vagrant
 
 ### **Environment**

@@ -1,0 +1,94 @@
+# ==============================================================================
+# kcli profile: archlinux
+# ==============================================================================
+
+archlinux:
+
+  # base
+  image: https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
+
+  # resources
+  numcpus: 2
+  memory: 2048
+
+  # firmware
+  uefi: true
+  secureboot: false
+
+  # storage
+  disk:
+    - size 32
+
+  # networking
+  nets:
+    - default
+  reservedns: true
+
+  # users
+  vmuser: somebody
+
+  # metadata
+  storemetadata: true
+
+  # variables
+  pkgs:
+    - binutils
+    - clang
+    - cmake
+    - curl
+    - docker
+    - fish
+    - gcc
+    - gdb
+    - git
+    - htop
+    - less
+    - make
+    - meson
+    - ninja
+    - patchelf
+    - python-pygments
+    - rsync
+    - tmux
+    - vim
+
+  # provision
+  files:
+    # configs
+    - path: /box/provision/configs
+      origin: ~/.kcli/provision/configs
+    # identity
+    - path: /box/provision/identity/user/.gitconfig
+      origin: ~/.gitconfig
+
+  cmds:
+    # provisioning
+    - mkdir -p /box/info
+    - echo "{{ name }}"   > /box/info/box
+    - echo "cloudinit"    > /box/info/box_originator
+    - echo "archlinux"    > /box/info/os
+    - echo "rolling"      > /box/info/os_version
+    - echo "archlinux"    > /box/info/os_version_codename
+    - echo "dev"          > /box/info/profile
+    - echo "initializing" > /box/info/status
+
+    # setup users
+    - echo {{ vmuser }}:{{ vmuser }} | chpasswd
+
+    # install packages (system)
+    - pacman -Syu --noconfirm {{ pkgs | join(' ') }}
+
+    # setup users (configs)
+    - rsync -r --chown={{ vmuser }}:{{ vmuser }} --chmod=D0755,F0644 /box/provision/configs/* /
+    - rsync -r --chown={{ vmuser }}:{{ vmuser }} --chmod=D0755,F0644 /box/provision/identity/user/* /home/{{ vmuser }}
+    - sudo -u {{ vmuser }} -H fish -c "set -U fish_greeting ''"
+    - chsh -s /usr/bin/fish {{ vmuser }}
+    - usermod -aG docker,wheel {{ vmuser }}
+
+    # install packages (user)
+    - curl -LsSf https://sh.rustup.rs                                           | sudo -u {{ vmuser }} -H sh -s -- --yes --default toolchain nightly
+    - curl -LsSf https://astral.sh/uv/install.sh                                | sudo -u {{ vmuser }} -H sh
+    - curl -LsSf https://github.com/cyrus-and/gdb-dashboard/raw/master/.gdbinit | sudo -u {{ vmuser }} -H tee /home/{{ vmuser }}/.config/gdb/gdbinit
+
+    # provisioning (done)
+    - echo "complete" > /box/info/status
